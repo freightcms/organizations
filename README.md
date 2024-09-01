@@ -20,8 +20,16 @@ use (
 
 ### .env file
 
+**On Windows**
+
 ```dotenv
-MONGO_SERVER=mongodb://root:example@0.0.0.0:27017/
+echo MONGO_SERVER=mongodb://root:example@0.0.0.0:27017/ > .env
+```
+
+**on linux/unix**
+
+```dotenv
+echo "MONGO_SERVER=mongodb://root:example@0.0.0.0:27017/" >> .env
 ```
 
 ## Running
