@@ -10,8 +10,8 @@ var (
 	RootQuery *graphql.Object = graphql.NewObject(graphql.ObjectConfig{
 		Name: "RootQuery",
 		Fields: graphql.Fields{
-			"people": &graphql.Field{
-				Type: graphql.NewList(PersonObject),
+			"organizations": &graphql.Field{
+				Type: graphql.NewList(OrganizationObject),
 				Args: graphql.FieldConfigArgument{
 					"page": &graphql.ArgumentConfig{
 						Type:         graphql.Int,
@@ -37,13 +37,13 @@ var (
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					mgr := mongodb.FromContext(p.Context)
 					q := db.NewQuery()
-					if p.Args["page"] != nil {
+					if _, ok := p.Args["page"]; ok {
 						q.SetPage(p.Args["page"].(int))
 					}
-					if p.Args["pageSize"] != nil {
+					if _, ok := p.Args["pageSize"]; ok {
 						q.SetPageSize(p.Args["pageSize"].(int))
 					}
-					if p.Args["sortBy"] != nil {
+					if _, ok := p.Args["sortBy"]; ok {
 						q.SetSortBy(p.Args["sortBy"].(string))
 					}
 					people, err := mgr.Get(q)

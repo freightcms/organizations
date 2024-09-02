@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/graphql-go/graphql"
@@ -8,80 +9,101 @@ import (
 	"github.com/squishedfox/webservice-prototype/models"
 )
 
+func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
+	return &models.Organization{
+		ID:       "",
+		Name:     params.Args["name"].(string),
+		DBA:      params.Args["dba"].(string),
+		RollupID: params.Args["rollupId"].(string),
+	}
+}
+
+func MergeOrganization(o *models.Organization, params graphql.ResolveParams) {
+	if _, ok := params.Args["dba"]; ok {
+		o.DBA = params.Args["dba"].(string)
+	}
+	if _, ok := params.Args["name"]; ok {
+		o.Name = params.Args["name"].(string)
+	}
+	if _, ok := params.Args["rollupId"]; ok {
+		o.RollupID = params.Args["rollupId"].(string)
+	}
+}
+
 var (
 	Mutations *graphql.Object = graphql.NewObject(graphql.ObjectConfig{
 		Name: "mutations",
 		Fields: graphql.Fields{
-			"createPerson": &graphql.Field{
+			"createOrganization": &graphql.Field{
 				Type:        IDObject,
-				Description: "Create new Person",
+				Description: "Create new Organization",
 				Args: graphql.FieldConfigArgument{
-					"firstName": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
+					"dba": &graphql.ArgumentConfig{
+						Description: DBAField.Description,
+						Type:        DBAField.Type,
 					},
-					"lastName": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
+					"name": &graphql.ArgumentConfig{
+						Description: NameField.Description,
+						Type:        NameField.Type,
+					},
+					"rollupId": &graphql.ArgumentConfig{
+						Description: RollupID.Description,
+						Type:        RollupID.Type,
 					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					model := models.Person{
-						FirstName: params.Args["firstName"].(string),
-						LastName:  params.Args["lastName"].(string),
-					}
-
+					model := OrganizationFromParams(params)
 					mgr := mongodb.FromContext(params.Context)
-					id, err := mgr.CreatePerson(model)
+					id, err := mgr.CreateOrganization(model)
 					if err != nil {
 						return nil, err
 					}
 					return id, err
 				},
 			},
-			"deletePerson": &graphql.Field{
+			"deleteOrganization": &graphql.Field{
 				Type:        graphql.Boolean,
 				Description: "Delete an existing Person resource",
 				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
+					"id": &IDArgumentField,
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					mgr := mongodb.FromContext(params.Context)
-					err := mgr.DeletePerson(params.Args["id"].(string))
+					if _, ok := params.Args["id"]; !ok {
+						return false, errors.New("no Resource with the ID exists")
+					}
+					err := mgr.DeleteOrganization(params.Args["id"].(string))
 					return true, err
 				},
 			},
-			"updatePerson": &graphql.Field{
+			"UpdateOrganization": &graphql.Field{
 				Type:        graphql.Boolean,
-				Description: "Update an existing person object",
+				Description: "Update an existing Organization object. All fields exceept for the ID field are optional since they are not set if they are not provided in the query.",
 				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
+					"id": &IDArgumentField,
+					"dba": &graphql.ArgumentConfig{
+						Type: graphql.String,
 					},
-					"firstName": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.String,
 					},
-					"lastName": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
+					"rollupId": &graphql.ArgumentConfig{
+						Type: graphql.String,
 					},
 				}, // ends aarguments
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					mgr := mongodb.FromContext(params.Context)
-					id := params.Args["id"]
-					p, err := mgr.GetById(id)
+					id := params.Args["id"].(string)
+					model, err := mgr.GetById(id)
 					if err != nil {
 						return nil, err
 					}
-					if p == nil {
+					if model == nil {
 						return nil, fmt.Errorf("could not find person with ID %s", id)
 					}
-					if params.Args["firstName"] != nil {
-						p.FirstName = params.Args["firstName"].(string)
-					}
-					if params.Args["lastName"] != nil {
-						p.LastName = params.Args["lastName"].(string)
-					}
-					if err := mgr.UpdatePerson(id, *p); err != nil {
+					MergeOrganization(model, params)
+
+					if err := mgr.UpdateOrganization(id, model); err != nil {
 						return nil, err
 					}
 					return true, nil

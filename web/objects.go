@@ -8,23 +8,16 @@ var (
 	IDObject *graphql.Object = graphql.NewObject(graphql.ObjectConfig{
 		Name: "ID",
 		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.String,
-			},
+			"id": &IDField,
 		},
 	})
-	PersonObject *graphql.Object = graphql.NewObject(graphql.ObjectConfig{
-		Name: "Person",
+	OrganizationObject *graphql.Object = graphql.NewObject(graphql.ObjectConfig{
+		Name: "Organization",
 		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.String,
-			},
-			"firstName": &graphql.Field{
-				Type: graphql.String,
-			},
-			"lastName": &graphql.Field{
-				Type: graphql.String,
-			},
+			"id":       &IDField,
+			"dba":      &DBAField,
+			"name":     &NameField,
+			"rollupId": &RollupID,
 		},
 	})
 )
