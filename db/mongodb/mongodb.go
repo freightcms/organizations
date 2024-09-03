@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/squishedfox/webservice-prototype/db"
-	"github.com/squishedfox/webservice-prototype/models"
+	"github.com/squishedfox/organization-webservice/db"
+	"github.com/squishedfox/organization-webservice/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -87,6 +87,7 @@ func FromContext(ctx context.Context) db.OrganizationResourceManager {
 }
 
 func (r *resourceManager) CreateOrganization(model *models.Organization) (interface{}, error) {
+	fmt.Printf("Model = %v", model)
 	insertedResult, err := r.collection().InsertOne(r.session,
 		&model,
 		options.InsertOne(),

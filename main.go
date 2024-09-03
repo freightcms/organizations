@@ -10,8 +10,8 @@ import (
 
 	dotenv "github.com/dotenv-org/godotenvvault"
 	"github.com/graphql-go/handler"
-	"github.com/squishedfox/webservice-prototype/db/mongodb"
-	"github.com/squishedfox/webservice-prototype/web"
+	"github.com/squishedfox/organization-webservice/db/mongodb"
+	"github.com/squishedfox/organization-webservice/web"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

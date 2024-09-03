@@ -2,8 +2,8 @@ package web
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/squishedfox/webservice-prototype/db"
-	"github.com/squishedfox/webservice-prototype/db/mongodb"
+	"github.com/squishedfox/organization-webservice/db"
+	"github.com/squishedfox/organization-webservice/db/mongodb"
 )
 
 var (

@@ -5,13 +5,12 @@ import (
 	"fmt"
 
 	"github.com/graphql-go/graphql"
-	"github.com/squishedfox/webservice-prototype/db/mongodb"
-	"github.com/squishedfox/webservice-prototype/models"
+	"github.com/squishedfox/organization-webservice/db/mongodb"
+	"github.com/squishedfox/organization-webservice/models"
 )
 
 func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 	return &models.Organization{
-		ID:       "",
 		Name:     params.Args["name"].(string),
 		DBA:      params.Args["dba"].(string),
 		RollupID: params.Args["rollupId"].(string),
@@ -35,7 +34,7 @@ var (
 		Name: "mutations",
 		Fields: graphql.Fields{
 			"createOrganization": &graphql.Field{
-				Type:        IDObject,
+				Type:        graphql.String,
 				Description: "Create new Organization",
 				Args: graphql.FieldConfigArgument{
 					"dba": &graphql.ArgumentConfig{
