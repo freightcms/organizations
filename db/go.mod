@@ -2,11 +2,7 @@ module github.com/squishedfox/organization-webservice/db
 
 go 1.22.5
 
-require (
-	github.com/squishedfox/webservice-prototype/db v0.0.0-20240828013341-1e3af704cd1b
-	github.com/squishedfox/webservice-prototype/models v0.0.0-20240828013341-1e3af704cd1b
-	go.mongodb.org/mongo-driver v1.16.1
-)
+require go.mongodb.org/mongo-driver v1.16.1
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect
