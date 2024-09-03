@@ -1,6 +1,6 @@
 package db
 
-import "github.com/squishedfox/webservice-prototype/models"
+import "github.com/squishedfox/organization-webservice/models"
 
 type OrganizationQuery struct {
 	// Page to start sorting by. Indexing at 1
