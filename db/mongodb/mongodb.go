@@ -100,6 +100,20 @@ func (r *resourceManager) CreateOrganization(model *models.Organization) (interf
 	if err != nil {
 		return nil, err
 	}
+	if len(model.RollupID) != 0 {
+		rollupId, err := primitive.ObjectIDFromHex(model.RollupID)
+		if err != nil {
+			return nil, err
+		}
+
+		count, err := r.collection().CountDocuments(r.session, bson.M{"_id": rollupId})
+		if err != nil {
+			return nil, err
+		}
+		if count == 0 {
+			return nil, errors.New("cannot set rollup id to id that does not match another organization")
+		}
+	}
 	id := insertedResult.InsertedID.(primitive.ObjectID)
 
 	return id.Hex(), nil
@@ -115,8 +129,18 @@ func (r *resourceManager) DeleteOrganization(id interface{}) error {
 		return err
 	}
 
+	if err := r.session.StartTransaction(); err != nil {
+		return err
+	}
+
 	filter := bson.M{"_id": objectId}
-	_, err = r.collection().DeleteOne(r.session, filter)
+	if _, err = r.collection().DeleteOne(r.session, filter); err != nil {
+		return err
+	}
+	if _, err = r.collection().UpdateMany(r.session, bson.M{"rollupId": objectId}, &bson.M{"rollupId": ""}); err != nil {
+		return err
+	}
+	err = r.session.CommitTransaction(r.session)
 	return err
 }
 
