@@ -26,6 +26,25 @@ type resourceManager struct {
 	session mongo.SessionContext
 }
 
+// WithContext fetches the mongo db session context from that passed argument (parent context)
+// ,appends the Organization manager and returns all with the new context.
+func WithContext(session mongo.SessionContext) context.Context {
+	if session == nil {
+		panic("Could not fetch session from context")
+	}
+	mgr := NewOrganizationManager(session)
+	return context.WithValue(session, ContextKey, mgr)
+}
+
+func FromContext(ctx context.Context) db.OrganizationResourceManager {
+	val := ctx.Value(ContextKey)
+	if val == nil {
+		panic(errors.New("could not fetch OrganizationResourceManager from context"))
+	}
+
+	return val.(*resourceManager)
+}
+
 // Get implements db.PersonResourceManager.
 func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organization, error) {
 	projection := bson.D{}
@@ -67,25 +86,6 @@ func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organizati
 	}
 	return results, nil
 
-}
-
-// WithContext fetches the mongo db session context from that passed argument (parent context)
-// ,appends the Organization manager and returns all with the new context.
-func WithContext(session mongo.SessionContext) context.Context {
-	if session == nil {
-		panic("Could not fetch session from context")
-	}
-	mgr := NewOrganizationManager(session)
-	return context.WithValue(session, ContextKey, mgr)
-}
-
-func FromContext(ctx context.Context) db.OrganizationResourceManager {
-	val := ctx.Value(ContextKey)
-	if val == nil {
-		panic(errors.New("could not fetch OrganizationResourceManager from context"))
-	}
-
-	return val.(*resourceManager)
 }
 
 func (r *resourceManager) CreateOrganization(model *models.Organization) (interface{}, error) {
@@ -149,6 +149,20 @@ func (r *resourceManager) UpdateOrganization(id interface{}, model *models.Organ
 		return err
 	}
 
+	if len(model.RollupID) != 0 {
+		rollupId, err := primitive.ObjectIDFromHex(model.RollupID)
+		if err != nil {
+			return err
+		}
+
+		count, err := r.collection().CountDocuments(r.session, bson.M{"_id": rollupId})
+		if err != nil {
+			return err
+		}
+		if count == 0 {
+			return errors.New("cannot set rollup id to id that does not match another organization")
+		}
+	}
 	filter := bson.M{"_id": objectId}
 	result, err := r.collection().UpdateOne(r.session, filter, model)
 
