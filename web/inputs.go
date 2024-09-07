@@ -41,7 +41,14 @@ var (
 		Name: "mutations",
 		Fields: graphql.Fields{
 			"createOrganization": &graphql.Field{
-				Type:        graphql.String,
+				Name: "CreateOrganization",
+				Type: graphql.NewObject(graphql.ObjectConfig{
+					Name:        "IDResponse",
+					Description: "receive this response during a simple operation",
+					Fields: graphql.Fields{
+						"id": IDField,
+					},
+				}),
 				Description: "Create new Organization",
 				Args: graphql.FieldConfigArgument{
 					"dba": &graphql.ArgumentConfig{
@@ -64,7 +71,12 @@ var (
 					if err != nil {
 						return nil, err
 					}
-					return id, err
+					resp := struct {
+						ID string `json:"id" bson:"id"`
+					}{
+						ID: id.(string),
+					}
+					return &resp, err
 				},
 			},
 			"deleteOrganization": &graphql.Field{
