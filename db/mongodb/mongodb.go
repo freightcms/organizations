@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
 	"slices"
 
 	"github.com/squishedfox/organization-webservice/db"
 	"github.com/squishedfox/organization-webservice/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -87,25 +89,50 @@ func FromContext(ctx context.Context) db.OrganizationResourceManager {
 }
 
 func (r *resourceManager) CreateOrganization(model *models.Organization) (interface{}, error) {
-	fmt.Printf("Model = %v", model)
 	insertedResult, err := r.collection().InsertOne(r.session,
-		&model,
+		&bson.M{
+			"dba":      model.DBA,
+			"name":     model.Name,
+			"rollupId": model.RollupID,
+		},
 		options.InsertOne(),
 	)
 	if err != nil {
 		return nil, err
 	}
-	return insertedResult.InsertedID, nil
+	id := insertedResult.InsertedID.(primitive.ObjectID)
+
+	return id.Hex(), nil
 }
 
 func (r *resourceManager) DeleteOrganization(id interface{}) error {
-	_, err := r.collection().DeleteOne(r.session, bson.M{"_id": id})
+	if reflect.TypeOf(id).Kind() != reflect.String {
+		return fmt.Errorf("cannot use typeof %s as id parameter", reflect.TypeOf(id).String())
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(id.(string))
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": objectId}
+	_, err = r.collection().DeleteOne(r.session, filter)
 	return err
 }
 
 func (r *resourceManager) GetById(id interface{}) (*models.Organization, error) {
 	var result models.Organization
-	filter := bson.M{"_id": id}
+
+	if reflect.TypeOf(id).Kind() != reflect.String {
+		return nil, fmt.Errorf("cannot use typeof %s as id parameter", reflect.TypeOf(id).String())
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(id.(string))
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": objectId}
 	if err := r.collection().FindOne(r.session, filter).Decode(&result); err != nil {
 		return nil, err
 	}
@@ -113,7 +140,17 @@ func (r *resourceManager) GetById(id interface{}) (*models.Organization, error) 
 }
 
 func (r *resourceManager) UpdateOrganization(id interface{}, model *models.Organization) error {
-	result, err := r.collection().UpdateOne(r.session, bson.M{"_id": id}, model)
+	if reflect.TypeOf(id).Kind() != reflect.String {
+		return fmt.Errorf("cannot use typeof %s as id parameter", reflect.TypeOf(id).String())
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(id.(string))
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": objectId}
+	result, err := r.collection().UpdateOne(r.session, filter, model)
 
 	if result.MatchedCount == 0 {
 		return fmt.Errorf("could not find Organization with id %s", id)

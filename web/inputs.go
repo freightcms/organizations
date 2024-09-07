@@ -10,11 +10,18 @@ import (
 )
 
 func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
-	return &models.Organization{
-		Name:     params.Args["name"].(string),
-		DBA:      params.Args["dba"].(string),
-		RollupID: params.Args["rollupId"].(string),
+	org := &models.Organization{}
+
+	if _, ok := params.Args["name"]; ok {
+		org.Name = params.Args["name"].(string)
 	}
+	if _, ok := params.Args["dba"]; ok {
+		org.DBA = params.Args["dba"].(string)
+	}
+	if _, ok := params.Args["rollupId"]; ok {
+		org.DBA = params.Args["rollupId"].(string)
+	}
+	return org
 }
 
 func MergeOrganization(o *models.Organization, params graphql.ResolveParams) {
