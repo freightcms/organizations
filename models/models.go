@@ -2,9 +2,6 @@ package models
 
 import locationModels "github.com/freightcms/locations/models"
 
-type OrganizationLocation struct {
-}
-
 // PersonModel provides an interface for serializing and deserializing
 // against data fetching APIs. Supports `json` and `bson` binding.
 type Organization struct {
