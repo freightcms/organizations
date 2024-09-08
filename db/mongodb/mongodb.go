@@ -129,7 +129,7 @@ func (r *resourceManager) DeleteOrganization(id interface{}) error {
 		return err
 	}
 
-	if err := r.session.StartTransaction(); err != nil {
+	if err = r.session.StartTransaction(); err != nil {
 		return err
 	}
 
