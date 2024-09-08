@@ -52,7 +52,7 @@ func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organizati
 	// see https://www.mongodb.com/docs/drivers/go/current/fundamentals/crud/read-operations/project/
 	for _, fieldName := range query.Fields {
 		// for security reasons we only want people to be able to query the objects that they should be able to
-		if slices.Contains([]string{"id", "dba", "name", "rollupId"}, fieldName) {
+		if slices.Contains([]string{"id", "dba", "name", "rollupId", "mailingAddress", "billingAddress"}, fieldName) {
 			projection = append(projection, bson.E{
 				Key:   fieldName,
 				Value: 1,
