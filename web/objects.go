@@ -39,8 +39,8 @@ var (
 				Description: "typically a five digit identifier followed by five or four specific mailing local",
 				Type:        graphql.NewNonNull(graphql.String),
 			},
-			"countryCode": &graphql.Field{
-				Name:        "countryCode",
+			"country": &graphql.Field{
+				Name:        "country",
 				Description: "two digit code ISO 3166-1 to identify country",
 				Type:        graphql.NewNonNull(graphql.String),
 			},
@@ -66,6 +66,14 @@ var (
 			"dba":      DBAField,
 			"name":     NameField,
 			"rollupId": RollupID,
+			"mailingAddress": &graphql.Field{
+				Name: "location",
+				Type: LocationObject,
+			},
+			"billingAddress": &graphql.Field{
+				Name: "location",
+				Type: LocationObject,
+			},
 		},
 	})
 )

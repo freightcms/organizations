@@ -5,9 +5,36 @@ import (
 	"fmt"
 
 	"github.com/graphql-go/graphql"
+
+	locationModels "github.com/freightcms/locations/models"
 	"github.com/squishedfox/organization-webservice/db/mongodb"
 	"github.com/squishedfox/organization-webservice/models"
 )
+
+func AddressFromArgs(args map[string]interface{}) *locationModels.AddressModel {
+	model := &locationModels.AddressModel{
+		Line1: args["line1"].(string),
+	}
+	if val, ok := args["line2"]; ok {
+		model.Line2 = val.(*string)
+	}
+	if val, ok := args["line3"]; ok {
+		model.Line3 = val.(*string)
+	}
+	if val, ok := args["locale"]; ok {
+		model.Local = val.(string)
+	}
+	if val, ok := args["countryCode"]; ok {
+		model.Country = locationModels.CountryCode(val.(string))
+	}
+	if val, ok := args["region"]; ok {
+		model.Region = val.(string)
+	}
+	if val, ok := args["postalCode"]; ok {
+		model.PostalCode = val.(string)
+	}
+	return model
+}
 
 func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 	org := &models.Organization{}
@@ -21,6 +48,14 @@ func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 	if _, ok := params.Args["rollupId"]; ok {
 		org.DBA = params.Args["rollupId"].(string)
 	}
+	if _, ok := params.Args["mailingAddress"]; ok {
+		mailingAddress := params.Args["mailingAddress"].(map[string]interface{})
+		org.MailingAddress = AddressFromArgs(mailingAddress)
+	}
+	if _, ok := params.Args["billingAddress"]; ok {
+		billingAddress := params.Args["billingAddress"].(map[string]interface{})
+		org.BillingAddress = AddressFromArgs(billingAddress)
+	}
 	return org
 }
 
@@ -32,12 +67,47 @@ func MergeOrganization(o *models.Organization, params graphql.ResolveParams) {
 		o.Name = params.Args["name"].(string)
 	}
 	if _, ok := params.Args["rollupId"]; ok {
-		o.RollupID = params.Args["rollupId"].(string)
+		o.RollupID = params.Args["rollupId"].(*string)
 	}
 }
 
 var (
-	Mutations *graphql.Object = graphql.NewObject(graphql.ObjectConfig{
+	CreateLocationInput = graphql.NewInputObject(graphql.InputObjectConfig{
+		Name: "CreateLocationInput",
+		Fields: graphql.InputObjectConfigFieldMap{
+			"line1": &graphql.InputObjectFieldConfig{
+				Description: "Typically the street number, house number in format 123 Fake St.",
+				Type:        graphql.NewNonNull(graphql.String),
+			},
+			"line2": &graphql.InputObjectFieldConfig{
+				Description:  "Typically includes a suite or unit number within a building",
+				Type:         graphql.String,
+				DefaultValue: nil,
+			},
+			"line3": &graphql.InputObjectFieldConfig{
+				Description:  "Typically a bin within a warehouse or a floor number and building section",
+				Type:         graphql.String,
+				DefaultValue: nil,
+			},
+			"locale": &graphql.InputObjectFieldConfig{
+				Description: "City, Town, Village within a state, place, or province",
+				Type:        graphql.NewNonNull(graphql.String),
+			},
+			"region": &graphql.InputObjectFieldConfig{
+				Description: "Typically a state or province or smaller named section within a country",
+				Type:        graphql.NewNonNull(graphql.String),
+			},
+			"postalCode": &graphql.InputObjectFieldConfig{
+				Description: "Zip or Postal Code to help identify city or village cross borders",
+				Type:        graphql.NewNonNull(graphql.String),
+			},
+			"countryCode": &graphql.InputObjectFieldConfig{
+				Description: "Two Letter Country Code",
+				Type:        graphql.NewNonNull(graphql.String),
+			},
+		},
+	})
+	Mutations = graphql.NewObject(graphql.ObjectConfig{
 		Name: "mutations",
 		Fields: graphql.Fields{
 			"createOrganization": &graphql.Field{
@@ -62,6 +132,14 @@ var (
 					"rollupId": &graphql.ArgumentConfig{
 						Description: RollupID.Description,
 						Type:        RollupID.Type,
+					},
+					"mailingAddress": &graphql.ArgumentConfig{
+						Description: "Can be any address which should be a physical location",
+						Type:        CreateLocationInput,
+					},
+					"billingAddress": &graphql.ArgumentConfig{
+						Description: "reliable address to forward invoices, shipping documents, or payments",
+						Type:        CreateLocationInput,
 					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
@@ -108,7 +186,7 @@ var (
 					"rollupId": &graphql.ArgumentConfig{
 						Type: graphql.String,
 					},
-				}, // ends aarguments
+				}, // ends arguments
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					mgr := mongodb.FromContext(params.Context)
 					id := params.Args["id"].(string)

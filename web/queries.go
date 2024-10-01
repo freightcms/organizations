@@ -1,6 +1,8 @@
 package web
 
 import (
+	"errors"
+
 	"github.com/graphql-go/graphql"
 	"github.com/squishedfox/organization-webservice/db"
 	"github.com/squishedfox/organization-webservice/db/mongodb"
@@ -10,6 +12,23 @@ var (
 	RootQuery *graphql.Object = graphql.NewObject(graphql.ObjectConfig{
 		Name: "RootQuery",
 		Fields: graphql.Fields{
+			"organization": &graphql.Field{
+				Type: OrganizationObject,
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type:        graphql.String,
+						Description: "identifier of organization to find. If this value is provided other arguments such as page, pageSize, and sort by are ignored",
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					mgr := mongodb.FromContext(p.Context)
+					if _, ok := p.Args["id"]; ok {
+						person, err := mgr.GetById(p.Args["id"].(string))
+						return person, err
+					}
+					return nil, errors.New("missing filter")
+				},
+			},
 			"organizations": &graphql.Field{
 				Type: graphql.NewList(OrganizationObject),
 				Args: graphql.FieldConfigArgument{

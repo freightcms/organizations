@@ -91,17 +91,19 @@ func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organizati
 func (r *resourceManager) CreateOrganization(model *models.Organization) (interface{}, error) {
 	insertedResult, err := r.collection().InsertOne(r.session,
 		&bson.M{
-			"dba":      model.DBA,
-			"name":     model.Name,
-			"rollupId": model.RollupID,
+			"dba":            model.DBA,
+			"name":           model.Name,
+			"rollupId":       model.RollupID,
+			"mailingAddress": model.MailingAddress,
+			"billingAddress": model.BillingAddress,
 		},
 		options.InsertOne(),
 	)
 	if err != nil {
 		return nil, err
 	}
-	if len(model.RollupID) != 0 {
-		rollupId, err := primitive.ObjectIDFromHex(model.RollupID)
+	if model.RollupID != nil {
+		rollupId, err := primitive.ObjectIDFromHex(*model.RollupID)
 		if err != nil {
 			return nil, err
 		}
@@ -157,7 +159,7 @@ func (r *resourceManager) GetById(id interface{}) (*models.Organization, error) 
 	}
 
 	filter := bson.M{"_id": objectId}
-	if err := r.collection().FindOne(r.session, filter).Decode(&result); err != nil {
+	if err := r.collection().FindOne(r.session, &filter).Decode(&result); err != nil {
 		return nil, err
 	}
 	return &result, nil
@@ -173,8 +175,8 @@ func (r *resourceManager) UpdateOrganization(id interface{}, model *models.Organ
 		return err
 	}
 
-	if len(model.RollupID) != 0 {
-		rollupId, err := primitive.ObjectIDFromHex(model.RollupID)
+	if model.RollupID != nil {
+		rollupId, err := primitive.ObjectIDFromHex(*model.RollupID)
 		if err != nil {
 			return err
 		}
