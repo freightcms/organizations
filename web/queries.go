@@ -16,7 +16,7 @@ var (
 				Type: OrganizationObject,
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
-						Type:        graphql.String,
+						Type:        IDField.Type,
 						Description: "identifier of organization to find. If this value is provided other arguments such as page, pageSize, and sort by are ignored",
 					},
 				},

@@ -59,6 +59,9 @@ func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 	return org
 }
 
+// MergeOrganization takes the first organization argument as the original organization
+// and appends the params that were provided in the graphql query. If a parameter argument
+// is provided for the field it is set.
 func MergeOrganization(o *models.Organization, params graphql.ResolveParams) {
 	if _, ok := params.Args["dba"]; ok {
 		o.DBA = params.Args["dba"].(string)
@@ -76,12 +79,12 @@ var (
 		Name: "CreateLocationInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"line1": &graphql.InputObjectFieldConfig{
-				Description: "Typically the street number, house number in format 123 Fake St.",
-				Type:        graphql.NewNonNull(graphql.String),
+				Description: Line1Field.Description,
+				Type:        Line1Field.Type,
 			},
 			"line2": &graphql.InputObjectFieldConfig{
-				Description:  "Typically includes a suite or unit number within a building",
-				Type:         graphql.String,
+				Description:  Line2Field.Description,
+				Type:         Line2Field.Type,
 				DefaultValue: nil,
 			},
 			"line3": &graphql.InputObjectFieldConfig{
@@ -90,20 +93,24 @@ var (
 				DefaultValue: nil,
 			},
 			"locale": &graphql.InputObjectFieldConfig{
-				Description: "City, Town, Village within a state, place, or province",
-				Type:        graphql.NewNonNull(graphql.String),
+				Description: LocaleField.Description,
+				Type:        LocaleField.Type,
 			},
 			"region": &graphql.InputObjectFieldConfig{
-				Description: "Typically a state or province or smaller named section within a country",
-				Type:        graphql.NewNonNull(graphql.String),
+				Description: RegionField.Description,
+				Type:        RegionField.Type,
 			},
 			"postalCode": &graphql.InputObjectFieldConfig{
-				Description: "Zip or Postal Code to help identify city or village cross borders",
-				Type:        graphql.NewNonNull(graphql.String),
+				Description: PostalCodeField.Description,
+				Type:        PostalCodeField.Type,
 			},
 			"countryCode": &graphql.InputObjectFieldConfig{
-				Description: "Two Letter Country Code",
-				Type:        graphql.NewNonNull(graphql.String),
+				Description: CountryField.Description,
+				Type:        CountryField.Type,
+			},
+			"attention": &graphql.InputObjectFieldConfig{
+				Description: AttentionField.Description,
+				Type:        AttentionField.Type,
 			},
 		},
 	})
@@ -116,7 +123,7 @@ var (
 					Name:        "IDResponse",
 					Description: "receive this response during a simple operation",
 					Fields: graphql.Fields{
-						"id": IDField,
+						"id": &IDField,
 					},
 				}),
 				Description: "Create new Organization",
@@ -130,8 +137,8 @@ var (
 						Type:        NameField.Type,
 					},
 					"rollupId": &graphql.ArgumentConfig{
-						Description: RollupID.Description,
-						Type:        RollupID.Type,
+						Description: RollupIDField.Description,
+						Type:        RollupIDField.Type,
 					},
 					"mailingAddress": &graphql.ArgumentConfig{
 						Description: "Can be any address which should be a physical location",
@@ -178,13 +185,16 @@ var (
 				Args: graphql.FieldConfigArgument{
 					"id": &IDArgumentField,
 					"dba": &graphql.ArgumentConfig{
-						Type: graphql.String,
+						Description: DBAField.Description,
+						Type:        graphql.String,
 					},
 					"name": &graphql.ArgumentConfig{
-						Type: graphql.String,
+						Description: NameField.Description,
+						Type:        graphql.String,
 					},
 					"rollupId": &graphql.ArgumentConfig{
-						Type: graphql.String,
+						Description: RollupIDField.Description,
+						Type:        graphql.String,
 					},
 				}, // ends arguments
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
