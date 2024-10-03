@@ -11,6 +11,8 @@ require (
 )
 
 require (
+	github.com/freightcms/common/models v1.1.0 // indirect
+	github.com/freightcms/locations/models v1.1.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/graphql-go/graphql v0.8.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect

@@ -3,7 +3,7 @@ module github.com/squishedfox/organization-webservice/web
 go 1.22.6
 
 require (
-	github.com/freightcms/locations/models v1.0.1
+	github.com/freightcms/locations/models v1.1.0
 	github.com/graphql-go/graphql v0.8.1
 	github.com/squishedfox/organization-webservice/db v0.0.0-20240903022458-8a0aaf3e37f6
 	github.com/squishedfox/organization-webservice/db/mongodb v0.0.0-20240903022458-8a0aaf3e37f6
@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	github.com/freightcms/common/models v1.0.0 // indirect
+	github.com/freightcms/common/models v1.1.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect

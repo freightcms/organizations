@@ -11,8 +11,9 @@ import (
 	"github.com/squishedfox/organization-webservice/models"
 )
 
-func AddressFromArgs(args map[string]interface{}) *locationModels.AddressModel {
+func AddressFromArgs(locationType locationModels.AddressType, args map[string]interface{}) *locationModels.AddressModel {
 	model := &locationModels.AddressModel{
+		Type:  locationType,
 		Line1: args["line1"].(string),
 	}
 	if val, ok := args["line2"]; ok {
@@ -22,7 +23,7 @@ func AddressFromArgs(args map[string]interface{}) *locationModels.AddressModel {
 		model.Line3 = val.(*string)
 	}
 	if val, ok := args["locale"]; ok {
-		model.Local = val.(string)
+		model.Locale = val.(string)
 	}
 	if val, ok := args["countryCode"]; ok {
 		model.Country = locationModels.CountryCode(val.(string))
@@ -49,18 +50,18 @@ func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 		org.Name = params.Args["name"].(string)
 	}
 	if _, ok := params.Args["dba"]; ok {
-		org.DBA = params.Args["dba"].(string)
+		org.DBA = params.Args["dba"].(*string)
 	}
 	if _, ok := params.Args["rollupId"]; ok {
-		org.DBA = params.Args["rollupId"].(string)
+		org.RollupID = params.Args["rollupId"].(*string)
 	}
 	if _, ok := params.Args["mailingAddress"]; ok {
 		mailingAddress := params.Args["mailingAddress"].(map[string]interface{})
-		org.MailingAddress = AddressFromArgs(mailingAddress)
+		org.MailingAddress = AddressFromArgs(locationModels.Mailing, mailingAddress)
 	}
 	if _, ok := params.Args["billingAddress"]; ok {
 		billingAddress := params.Args["billingAddress"].(map[string]interface{})
-		org.BillingAddress = AddressFromArgs(billingAddress)
+		org.BillingAddress = AddressFromArgs(locationModels.Billing, billingAddress)
 	}
 	return org
 }
@@ -70,7 +71,7 @@ func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 // is provided for the field it is set.
 func MergeOrganization(o *models.Organization, params graphql.ResolveParams) {
 	if _, ok := params.Args["dba"]; ok {
-		o.DBA = params.Args["dba"].(string)
+		o.DBA = params.Args["dba"].(*string)
 	}
 	if _, ok := params.Args["name"]; ok {
 		o.Name = params.Args["name"].(string)

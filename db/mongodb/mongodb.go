@@ -89,6 +89,9 @@ func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organizati
 }
 
 func (r *resourceManager) CreateOrganization(model *models.Organization) (interface{}, error) {
+	if model.MailingAddress != nil {
+		model.MailingAddress.Id = primitive.NewObjectID()
+	}
 	insertedResult, err := r.collection().InsertOne(r.session,
 		&bson.M{
 			"dba":            model.DBA,
