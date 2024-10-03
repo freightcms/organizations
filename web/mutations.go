@@ -33,6 +33,12 @@ func AddressFromArgs(args map[string]interface{}) *locationModels.AddressModel {
 	if val, ok := args["postalCode"]; ok {
 		model.PostalCode = val.(string)
 	}
+	if val, ok := args["attention"]; ok {
+		model.Attention = val.(*string)
+	}
+	if val, ok := args["descriptoin"]; ok {
+		model.Description = val.(*string)
+	}
 	return model
 }
 
