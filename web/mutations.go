@@ -40,6 +40,9 @@ func AddressFromArgs(locationType locationModels.AddressType, args map[string]in
 	if val, ok := args["description"]; val != nil && ok {
 		model.Description = val.(*string)
 	}
+	if val, ok := args["notes"]; val != nil && ok {
+		model.Notes = val.(*string)
+	}
 	return model
 }
 
