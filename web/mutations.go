@@ -16,10 +16,10 @@ func AddressFromArgs(locationType locationModels.AddressType, args map[string]in
 		Type:  locationType,
 		Line1: args["line1"].(string),
 	}
-	if val, ok := args["line2"]; ok {
+	if val, ok := args["line2"]; val != nil && ok {
 		model.Line2 = val.(*string)
 	}
-	if val, ok := args["line3"]; ok {
+	if val, ok := args["line3"]; val != nil && ok {
 		model.Line3 = val.(*string)
 	}
 	if val, ok := args["locale"]; ok {
@@ -34,10 +34,10 @@ func AddressFromArgs(locationType locationModels.AddressType, args map[string]in
 	if val, ok := args["postalCode"]; ok {
 		model.PostalCode = val.(string)
 	}
-	if val, ok := args["attention"]; ok {
+	if val, ok := args["attention"]; val != nil && ok {
 		model.Attention = val.(*string)
 	}
-	if val, ok := args["description"]; ok {
+	if val, ok := args["description"]; val != nil && ok {
 		model.Description = val.(*string)
 	}
 	return model
