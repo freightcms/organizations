@@ -10,6 +10,8 @@ github.com/freightcms/locations/models v1.1.0 h1:ikfH2gRj7pxCERuhh0Nq4Yvyrl/Rlrg
 github.com/freightcms/locations/models v1.1.0/go.mod h1:90bnwGKbUNDT/hoLAV5DTvw+allCdbDYHeQXLElE914=
 github.com/freightcms/locations/web v1.0.0 h1:MRP8TYRylIMKKNRUfTutT+lcI46ELeMU3ZBL7BJoOgI=
 github.com/freightcms/locations/web v1.0.0/go.mod h1:acusOTSMvEEd73Dhb3YHwNCLHXVK6RoaIc5Y6Y71nhk=
+github.com/freightcms/locations/web v1.0.1 h1:/mXWvOIv8cRe8sNx1zlgGXKffl8yFNAq0/aWUUXwvmw=
+github.com/freightcms/locations/web v1.0.1/go.mod h1:tWUYlb7kh947W32KGijz8LxVYdTQbJw09aHDdv6HWLI=
 github.com/golang/snappy v0.0.4 h1:yAGX7huGHXlcLOEtBnF4w7FQwA26wojNCwOYAEhLjQM=
 github.com/golang/snappy v0.0.4/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=

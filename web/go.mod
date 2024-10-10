@@ -12,7 +12,7 @@ require (
 
 require (
 	github.com/freightcms/common/models v1.1.0 // indirect
-	github.com/freightcms/locations/web v1.0.0 // indirect
+	github.com/freightcms/locations/web v1.0.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
