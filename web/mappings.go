@@ -2,43 +2,10 @@ package web
 
 import (
 	locationModels "github.com/freightcms/locations/models"
+	locationWeb "github.com/freightcms/locations/web"
+	"github.com/graphql-go/graphql"
 	"github.com/squishedfox/organization-webservice/models"
 )
-
-func AddressFromArgs(locationType locationModels.AddressType, args map[string]interface{}) *locationModels.AddressModel {
-	model := &locationModels.AddressModel{
-		Type:  locationType,
-		Line1: args["line1"].(string),
-	}
-	if val, ok := args["line2"]; val != nil && ok {
-		model.Line2 = val.(*string)
-	}
-	if val, ok := args["line3"]; val != nil && ok {
-		model.Line3 = val.(*string)
-	}
-	if val, ok := args["locale"]; ok {
-		model.Locale = val.(string)
-	}
-	if val, ok := args["countryCode"]; ok {
-		model.Country = locationModels.CountryCode(val.(string))
-	}
-	if val, ok := args["region"]; ok {
-		model.Region = val.(string)
-	}
-	if val, ok := args["postalCode"]; ok {
-		model.PostalCode = val.(string)
-	}
-	if val, ok := args["attention"]; val != nil && ok {
-		model.Attention = val.(*string)
-	}
-	if val, ok := args["description"]; val != nil && ok {
-		model.Description = val.(*string)
-	}
-	if val, ok := args["notes"]; val != nil && ok {
-		model.Notes = val.(*string)
-	}
-	return model
-}
 
 func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 	org := &models.Organization{}
@@ -54,11 +21,11 @@ func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 	}
 	if _, ok := params.Args["mailingAddress"]; ok {
 		mailingAddress := params.Args["mailingAddress"].(map[string]interface{})
-		org.MailingAddress = AddressFromArgs(locationModels.Mailing, mailingAddress)
+		org.MailingAddress = locationWeb.AddressFromArgs(locationModels.Mailing, mailingAddress)
 	}
 	if _, ok := params.Args["billingAddress"]; ok {
 		billingAddress := params.Args["billingAddress"].(map[string]interface{})
-		org.BillingAddress = AddressFromArgs(locationModels.Billing, billingAddress)
+		org.BillingAddress = locationWeb.AddressFromArgs(locationModels.Billing, billingAddress)
 	}
 	return org
 }
@@ -77,5 +44,3 @@ func MergeOrganization(o *models.Organization, params graphql.ResolveParams) {
 		o.RollupID = params.Args["rollupId"].(*string)
 	}
 }
-
-

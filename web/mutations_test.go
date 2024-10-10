@@ -2,6 +2,7 @@ package web
 
 import (
 	locationModels "github.com/freightcms/locations/models"
+	locationWeb "github.com/freightcms/locations/web"
 	"gotest.tools/v3/assert"
 	"testing"
 )
@@ -57,7 +58,7 @@ func Test_AddressFromArgs_Should_SetOptionalFields(t *testing.T) {
 		"notes":       &notes,
 	}
 	// act
-	addr := AddressFromArgs(locationModels.Billing, data)
+	addr := locationWeb.AddressFromArgs(locationModels.Billing, data)
 
 	// assert
 	assert.Equal(t, addr.Line1, data["line1"].(string))
