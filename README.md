@@ -65,6 +65,18 @@ should output
 { "status": "ok" }
 ```
 
+## Building Docker Image
+
+1. `docker build --tag docker-gs-ping .`
+
+You can tag with different tags by doing
+
+https://docs.docker.com/guides/golang/build-images/
+
+```sh
+docker image tag docker-gs-ping:latest docker-gs-ping:v1.0
+```
+
 ## Testing
 
 ### Scenarios
