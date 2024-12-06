@@ -1,4 +1,11 @@
 services:
+  web:
+    build: ./
+    environment:
+      - port=8080
+    ports:
+      - 8080:8080
+
   mongo:
     image: mongo
     restart: always
@@ -18,4 +25,6 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+    depends_on:
+      - mongo
 

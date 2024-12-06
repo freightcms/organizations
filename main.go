@@ -10,8 +10,8 @@ import (
 
 	dotenv "github.com/dotenv-org/godotenvvault"
 	"github.com/graphql-go/handler"
-	"organizations/db/mongodb"
-	"organizations/web"
+	"github.com/freightcms/organizations/db/mongodb"
+	"github.com/freightcms/organizations/web"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

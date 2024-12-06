@@ -4,7 +4,7 @@ import (
 	locationModels "github.com/freightcms/locations/models"
 	locationWeb "github.com/freightcms/locations/web"
 	"github.com/graphql-go/graphql"
-	"organizations/models"
+	"github.com/freightcms/organizations/models"
 )
 
 func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {

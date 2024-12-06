@@ -6,7 +6,7 @@ import (
 
 	locationWeb "github.com/freightcms/locations/web"
 	"github.com/graphql-go/graphql"
-	"organization/db"
+	"github.com/freightcms/organizations/db/mongodb"
 )
 
 var (
