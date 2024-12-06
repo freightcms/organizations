@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/graphql-go/graphql"
-	"github.com/squishedfox/organization-webservice/db"
-	"github.com/squishedfox/organization-webservice/db/mongodb"
+	"organization/db"
+	"organizationdb/mongodb"
 )
 
 var (
