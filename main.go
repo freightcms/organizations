@@ -9,11 +9,11 @@ import (
 	"os"
 
 	dotenv "github.com/dotenv-org/godotenvvault"
-	"organizations/db/mongodb"
-	"organizations/web"
 	"github.com/graphql-go/handler"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"organizations/db/mongodb"
+	"organizations/web"
 )
 
 var (
@@ -21,16 +21,17 @@ var (
 	host string
 )
 
+func init() {
+	dotenv.Load()
+}
+
 func main() {
 	flag.IntVar(&port, "p", 8080, "Port to run application on")
 	flag.StringVar(&host, "h", "0.0.0.0", "Host address to run application on")
 	ctx := context.Background()
+
 	fmt.Println("Starting application...")
 
-	if err := dotenv.Load(".env"); err != nil {
-		log.Fatal(err)
-		return
-	}
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(os.Getenv("MONGO_SERVER")).SetServerAPIOptions(serverAPI)
 	client, err := mongo.Connect(ctx, opts)

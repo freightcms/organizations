@@ -1,15 +1,15 @@
 # https://docs.docker.com/guides/golang/build-images/ 
 FROM golang:1.23
 
-WORKDIR /app
+WORKDIR /usr/local/go/src
 
 RUN mkdir organizations
 
-WORKDIR /app/organizations
+WORKDIR /usr/local/go/src/organizations
 
 COPY go.mod go.sum ./
 RUN go mod download 
-COPY *.go ./web/*.go ./db/*.go ./db/mongodb/*.go ./web/*.go  ./
+COPY . . 
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
 
