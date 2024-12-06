@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/graphql-go/graphql"
-	"github.com/freightcms/organizations/db"
-	"github.com/freightcms/organizations/db/mongodb"
+	"organizations/db"
+	"organizations/db/mongodb"
 )
 
 var (

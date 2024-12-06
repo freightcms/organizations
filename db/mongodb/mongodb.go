@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"slices"
 
-	"github.com/freightcms/organizations/db"
-	"github.com/freightcms/organizations/models"
+	"organizations/db"
+	"organizations/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

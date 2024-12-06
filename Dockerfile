@@ -3,10 +3,14 @@ FROM golang:1.23
 
 WORKDIR /app
 
-COPY go.mod go.sum ./ # copy dependency files
-RUN go mod download # install dependency files 
+RUN mkdir organizations
 
-COPY *.go ./ # copy source code into image
+WORKDIR /app/organizations
+
+COPY go.mod go.sum ./
+RUN go mod download 
+COPY *.go ./web/*.go ./db/*.go ./db/mongodb/*.go ./web/*.go  ./
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
 
 # Optional:
