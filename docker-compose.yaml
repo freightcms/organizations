@@ -4,7 +4,7 @@ services:
     environment:
       - port=8080
       - host=0.0.0.0
-      - MONGO_SERVER=mongodb://root:example@0.0.0.0:27017/
+      - MONGO_SERVER=mongodb://root:example@mongo:27017/
     ports:
       - 8080:8080
     depends_on:
