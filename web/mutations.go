@@ -75,7 +75,7 @@ var (
 					return true, err
 				},
 			},
-			"UpdateOrganization": &graphql.Field{
+			"updateOrganization": &graphql.Field{
 				Type:        graphql.Boolean,
 				Description: "Update an existing Organization object. All fields exceept for the ID field are optional since they are not set if they are not provided in the query.",
 				Args: graphql.FieldConfigArgument{

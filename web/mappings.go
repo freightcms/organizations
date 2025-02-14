@@ -1,10 +1,11 @@
 package web
 
 import (
+	"organizations/models"
+
 	locationModels "github.com/freightcms/locations/models"
 	locationWeb "github.com/freightcms/locations/web"
 	"github.com/graphql-go/graphql"
-	"organizations/models"
 )
 
 func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
@@ -14,10 +15,12 @@ func OrganizationFromParams(params graphql.ResolveParams) *models.Organization {
 		org.Name = params.Args["name"].(string)
 	}
 	if _, ok := params.Args["dba"]; ok {
-		org.DBA = params.Args["dba"].(*string)
+		dba := params.Args["dba"].(string)
+		org.DBA = &dba
 	}
 	if _, ok := params.Args["rollupId"]; ok {
-		org.RollupID = params.Args["rollupId"].(*string)
+		rollupId := params.Args["rollupId"].(string)
+		org.RollupID = &rollupId
 	}
 	if _, ok := params.Args["mailingAddress"]; ok {
 		mailingAddress := params.Args["mailingAddress"].(map[string]interface{})
