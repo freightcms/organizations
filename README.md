@@ -7,14 +7,14 @@ A prototype building out with GraphQL, Golang, and MongoDB
 ### Go work
 
 ```txt
-go 1.22.5
+go 1.23.4
 
 use (
-    .
-    ./db
-    ./db/mongodb
-    ./models
-    ./web
+	.
+	./db
+	./db/mongodb
+	./models
+	./web
 )
 ```
 
