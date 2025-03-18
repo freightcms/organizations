@@ -1,4 +1,4 @@
-module organizations
+module github.com/freightcms/organizations
 
 go 1.23.1
 

@@ -1,7 +1,7 @@
 package web
 
 import (
-	"organizations/models"
+	"github.com/freightcms/organizations/models"
 
 	locationModels "github.com/freightcms/locations/models"
 	locationWeb "github.com/freightcms/locations/web"

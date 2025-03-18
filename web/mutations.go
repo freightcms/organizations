@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	locationWeb "github.com/freightcms/locations/web"
+	"github.com/freightcms/organizations/db/mongodb"
 	"github.com/graphql-go/graphql"
-	"organizations/db/mongodb"
 )
 
 var (

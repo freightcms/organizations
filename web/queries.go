@@ -3,9 +3,10 @@ package web
 import (
 	"errors"
 
-	"github.com/graphql-go/graphql"
-	"organizations/db"
 	"organizations/db/mongodb"
+
+	"github.com/freightcms/organizations/db"
+	"github.com/graphql-go/graphql"
 )
 
 var (

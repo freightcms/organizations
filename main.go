@@ -9,11 +9,11 @@ import (
 	"os"
 
 	dotenv "github.com/dotenv-org/godotenvvault"
+	"github.com/freightcms/organizations/db/mongodb"
+	"github.com/freightcms/organizations/web"
 	"github.com/graphql-go/handler"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"organizations/db/mongodb"
-	"organizations/web"
 )
 
 var (

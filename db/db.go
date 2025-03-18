@@ -1,6 +1,6 @@
 package db
 
-import "organizations/models"
+import "github.com/freightcms/organizations/models"
 
 type OrganizationQuery struct {
 	// Page to start sorting by. Indexing at 1
