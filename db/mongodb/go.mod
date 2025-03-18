@@ -1,3 +1,3 @@
-module github.com/freightcms/organizations/mongodb
+module github.com/freightcms/organizations/db/mongodb
 
 go 1.23.4
