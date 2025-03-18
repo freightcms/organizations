@@ -3,7 +3,7 @@ package web
 import (
 	"errors"
 
-	"organizations/db/mongodb"
+	"github.com/freightcms/organizations/db/mongodb"
 
 	"github.com/freightcms/organizations/db"
 	"github.com/graphql-go/graphql"
