@@ -35,6 +35,9 @@ var (
 // be recovered from the db.DbContext object
 func addMongoDbMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return echo.HandlerFunc(func(c echo.Context) error {
+		if client == nil {
+			return next(c)
+		}
 		session, err := client.StartSession()
 		if err != nil {
 			return err
@@ -44,8 +47,8 @@ func addMongoDbMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		sessionContext := mongo.NewSessionContext(requestContext, session)
 		dbContext := db.DbContext{
-			Context:             requestContext,
-			OrganizationManager: mongodb.NewOrganizationManager(dbName, collectionName, sessionContext),
+			Context:                     requestContext,
+			OrganizationResourceManager: mongodb.NewOrganizationManager(dbName, collectionName, sessionContext),
 		}
 		wrappedContext := web.AppContext{
 			Context:   c,
@@ -55,7 +58,7 @@ func addMongoDbMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	})
 }
 
-func loggingMiddlewre(next echo.HandlerFunc) echo.HandlerFunc {
+func loggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return echo.HandlerFunc(func(c echo.Context) error {
 		req := c.Request()
 
@@ -105,18 +108,19 @@ func getAllowedOrigins() []string {
 }
 
 func main() {
+	var err error
 
 	flag.IntVar(&port, "p", 8080, "Port to run application on")
 	flag.StringVar(&host, "h", "0.0.0.0", "Host address to run application on")
 	flag.StringVar(&dbName, "database", "freightcms", "Name of the database to use when connecting. Defaults to freightcms")
 	flag.StringVar(&collectionName, "collection", "people", "Name of the collection in mongodb to use when connecting. Defaults to 'people'")
-	flag.StringVar(&allowedHosts, "allowedHosts", "localhost:8080", "Comma seperated list of hostnames that are allowed to communicate with service")
+	flag.StringVar(&allowedHosts, "allowedHosts", "localhost:8080", "Comma separated list of hostname that are allowed to communicate with service")
 
 	ctx := context.Background()
 
 	logger.Debug("Starting application...")
 
-	if err := dotenv.Load(".env"); err != nil {
+	if err = dotenv.Load(".env"); err != nil {
 		log.Fatal(err)
 		return
 	}
@@ -139,7 +143,7 @@ func main() {
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(os.Getenv("MONGO_SERVER")).SetServerAPIOptions(serverAPI)
-	client, err := mongo.Connect(ctx, opts)
+	client, err = mongo.Connect(ctx, opts)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -169,10 +173,10 @@ func main() {
 		},
 	}))
 
-	server.Use(loggingMiddlewre)
+	server.Use(loggingMiddleware)
 	server.Use(addMongoDbMiddleware)
 
-	web.Router(server)
+	web.Register(server)
 
 	logger.Debug("Done")
 	hostname := fmt.Sprintf("%v:%d", host, port)

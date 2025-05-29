@@ -15,6 +15,6 @@ type (
 	GetAllOrganizationsResponse struct {
 		// Total is the number of results that are in the query
 		Total         int64                  `json:"total" xml:"total"`
-		Organizations []*models.Organization `json:"people" xml:"organizations"`
+		Organizations []*models.Organization `json:"organizations" xml:"organizations"`
 	}
 )
