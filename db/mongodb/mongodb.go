@@ -1,7 +1,6 @@
 package mongodb
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -15,38 +14,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type OrganizationResourceManagerContextKey string
-
-const (
-	// ContextKey used to fetch or put the Person Resource Manager into the context
-	ContextKey OrganizationResourceManagerContextKey = "organizationResourceManagerContextKey"
-)
-
 type resourceManager struct {
-	session mongo.SessionContext
-}
-
-// WithContext fetches the mongo db session context from that passed argument (parent context)
-// ,appends the Organization manager and returns all with the new context.
-func WithContext(session mongo.SessionContext) context.Context {
-	if session == nil {
-		panic("Could not fetch session from context")
-	}
-	mgr := NewOrganizationManager(session)
-	return context.WithValue(session, ContextKey, mgr)
-}
-
-func FromContext(ctx context.Context) db.OrganizationResourceManager {
-	val := ctx.Value(ContextKey)
-	if val == nil {
-		panic(errors.New("could not fetch OrganizationResourceManager from context"))
-	}
-
-	return val.(*resourceManager)
+	collectionName string
+	dbName         string
+	session        mongo.SessionContext
 }
 
 // Get implements db.PersonResourceManager.
-func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organization, error) {
+func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organization, int64, error) {
 	projection := bson.D{}
 
 	// see https://www.mongodb.com/docs/drivers/go/current/fundamentals/crud/read-operations/project/
@@ -61,7 +36,7 @@ func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organizati
 	}
 	if len(query.SortBy) != 0 {
 		if !slices.Contains([]string{"_id", "id"}, query.SortBy) {
-			return nil, fmt.Errorf("%s is not a valid sortBy option", query.SortBy)
+			return nil, 0, fmt.Errorf("%s is not a valid sortBy option", query.SortBy)
 		}
 	}
 	sort := bson.D{bson.E{Key: query.SortBy, Value: 1}}
@@ -73,7 +48,7 @@ func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organizati
 
 	cursor, err := r.collection().Find(r.session, bson.D{}, opts)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	results := []*models.Organization{}
 	for cursor.Next(r.session) {
@@ -84,11 +59,15 @@ func (r *resourceManager) Get(query *db.OrganizationQuery) ([]*models.Organizati
 		}
 		results = append(results, &result)
 	}
-	return results, nil
+	count, err := r.collection().CountDocuments(r.session, &bson.D{}, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	return results, count, nil
 
 }
 
-func (r *resourceManager) CreateOrganization(model *models.Organization) (interface{}, error) {
+func (r *resourceManager) CreateOrganization(model *models.Organization) (any, error) {
 	if model.MailingAddress != nil {
 		model.MailingAddress.Id = primitive.NewObjectID()
 	}
@@ -105,8 +84,8 @@ func (r *resourceManager) CreateOrganization(model *models.Organization) (interf
 	if err != nil {
 		return nil, err
 	}
-	if model.RollupID != nil {
-		rollupId, err := primitive.ObjectIDFromHex(*model.RollupID)
+	if model.RollupID != "" {
+		rollupId, err := primitive.ObjectIDFromHex(model.RollupID)
 		if err != nil {
 			return nil, err
 		}
@@ -124,7 +103,7 @@ func (r *resourceManager) CreateOrganization(model *models.Organization) (interf
 	return id.Hex(), nil
 }
 
-func (r *resourceManager) DeleteOrganization(id interface{}) error {
+func (r *resourceManager) DeleteOrganization(id any) error {
 	if reflect.TypeOf(id).Kind() != reflect.String {
 		return fmt.Errorf("cannot use typeof %s as id parameter", reflect.TypeOf(id).String())
 	}
@@ -149,7 +128,7 @@ func (r *resourceManager) DeleteOrganization(id interface{}) error {
 	return err
 }
 
-func (r *resourceManager) GetById(id interface{}) (*models.Organization, error) {
+func (r *resourceManager) GetById(id any) (*models.Organization, error) {
 	var result models.Organization
 
 	if reflect.TypeOf(id).Kind() != reflect.String {
@@ -168,7 +147,7 @@ func (r *resourceManager) GetById(id interface{}) (*models.Organization, error) 
 	return &result, nil
 }
 
-func (r *resourceManager) UpdateOrganization(id interface{}, model *models.Organization) error {
+func (r *resourceManager) UpdateOrganization(id any, model *models.Organization) error {
 	if reflect.TypeOf(id).Kind() != reflect.String {
 		return fmt.Errorf("cannot use typeof %s as id parameter", reflect.TypeOf(id).String())
 	}
@@ -178,8 +157,8 @@ func (r *resourceManager) UpdateOrganization(id interface{}, model *models.Organ
 		return err
 	}
 
-	if model.RollupID != nil {
-		rollupId, err := primitive.ObjectIDFromHex(*model.RollupID)
+	if len(model.RollupID) > 0 {
+		rollupId, err := primitive.ObjectIDFromHex(model.RollupID)
 		if err != nil {
 			return err
 		}
@@ -202,10 +181,14 @@ func (r *resourceManager) UpdateOrganization(id interface{}, model *models.Organ
 }
 
 func (r *resourceManager) collection() *mongo.Collection {
-	coll := r.session.Client().Database("freightcms").Collection("organizations")
+	coll := r.session.Client().Database(r.dbName).Collection(r.collectionName)
 	return coll
 }
 
-func NewOrganizationManager(session mongo.SessionContext) db.OrganizationResourceManager {
-	return &resourceManager{session: session}
+func NewOrganizationManager(dbName, collectionName string, session mongo.SessionContext) db.OrganizationResourceManager {
+	return &resourceManager{
+		dbName:         dbName,
+		collectionName: collectionName,
+		session:        session,
+	}
 }
