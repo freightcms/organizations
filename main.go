@@ -10,11 +10,11 @@ import (
 	"os"
 	"strings"
 
-	dotenv "github.com/dotenv-org/godotenvvault"
 	"github.com/freightcms/logging"
 	"github.com/freightcms/organizations/db"
 	"github.com/freightcms/organizations/db/mongodb"
 	"github.com/freightcms/organizations/web"
+	dotenv "github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -121,8 +121,7 @@ func main() {
 	logger.Debug("Starting application...")
 
 	if err = dotenv.Load(".env"); err != nil {
-		log.Fatal(err)
-		return
+		logger.Warning("Could not find \".env\" file")
 	}
 	if dbName == "" {
 		dbName = os.Getenv("DATABASE_NAME")
