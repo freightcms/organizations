@@ -25,3 +25,5 @@ go.work.sum
 .env
 webservice-template
 organization-webservice
+.DS_Store
+
